@@ -1,0 +1,21 @@
+# Caches
+**/.cache/
+**/Cache/
+**/CacheStorage/
+
+# Sensitive
+**/*.pem
+**/*.key
+**/credentials*
+**/secrets*
+
+# Browser caches (for zen)
+zen/.zen/**/cache*/
+zen/.zen/**/Cache*/
+**/*.sqlite-shm
+**/*.sqlite-wal
+**/.parentlock
+**/lock
+
+# Neovim
+nvim/.config/nvim/.luarc.json

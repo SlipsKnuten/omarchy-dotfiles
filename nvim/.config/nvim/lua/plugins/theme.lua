@@ -1,0 +1,1 @@
+/home/pepw/.config/omarchy/current/theme/neovim.lua
