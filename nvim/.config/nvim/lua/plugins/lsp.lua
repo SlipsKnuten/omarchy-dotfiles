@@ -1,17 +1,4 @@
 return {
-  -- Disable all diagnostics (keep references and signature help)
-  {
-    "neovim/nvim-lspconfig",
-    opts = function(_, opts)
-      vim.diagnostic.config({
-        underline = false,
-        virtual_text = false,
-        signs = false,
-        update_in_insert = false,
-      })
-      return opts
-    end,
-  },
   -- Mason: ensure LSP servers are installed
   {
     "mason-org/mason.nvim",
