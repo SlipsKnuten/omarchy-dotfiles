@@ -1,6 +1,11 @@
 -- Autocmds are automatically loaded on the VeryLazy event
 -- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 
+-- Hide LSP semantic token highlighting for unresolved references
+-- This is what causes red underlines in Rust files (not diagnostics!)
+vim.api.nvim_set_hl(0, "@lsp.type.unresolvedReference", {})
+vim.api.nvim_set_hl(0, "@lsp.type.unresolvedReference.rust", {})
+
 -- Hide diagnostic underlines by clearing the highlight groups
 vim.api.nvim_set_hl(0, "DiagnosticUnderlineError", {})
 vim.api.nvim_set_hl(0, "DiagnosticUnderlineWarn", {})
