@@ -5,8 +5,11 @@
   "spacing": 0,
   "height": 26,
   "modules-left": ["custom/omarchy", "hyprland/workspaces"],
-  "modules-center": ["wlr/taskbar", "clock", "custom/update", "custom/screenrecording-indicator"],
+  "modules-center": ["wlr/taskbar"],
   "modules-right": [
+    "clock",
+    "custom/update",
+    "custom/screenrecording-indicator",
     "group/tray-expander",
     "bluetooth",
     "network",
