@@ -7,14 +7,12 @@
   "modules-left": ["custom/omarchy", "hyprland/workspaces"],
   "modules-center": ["wlr/taskbar"],
   "modules-right": [
-    "clock",
-    "custom/update",
-    "custom/screenrecording-indicator",
     "group/tray-expander",
+    "clock",
+    "custom/screenrecording-indicator",
     "bluetooth",
     "network",
     "pulseaudio",
-    "cpu",
     "battery"
   ],
   "hyprland/workspaces": {
@@ -132,7 +130,7 @@
       "transition-duration": 600,
       "children-class": "tray-group-item"
     },
-    "modules": ["custom/expand-icon", "tray"]
+    "modules": ["custom/expand-icon", "cpu", "custom/update", "tray"]
   },
   "custom/expand-icon": {
     "format": "",
