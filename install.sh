@@ -33,8 +33,3 @@ fi
 echo ""
 echo "Done! Restart your shell or run: source ~/.bashrc"
 echo "Then open nvim - Mason will auto-install LSP servers."
-echo ""
-echo "Optional: For a macOS-style dock, install via AUR:"
-echo "  yay -S nwg-dock-hyprland"
-echo "Then add to ~/.config/hypr/hyprland.conf:"
-echo "  exec-once = nwg-dock-hyprland -d"
