@@ -9,7 +9,7 @@
   "modules-right": [
     "group/tray-expander",
     "clock",
-    "custom/screenrecording-indicator",
+    "custom/update",
     "bluetooth",
     "network",
     "pulseaudio",
@@ -56,10 +56,11 @@
   "custom/update": {
     "format": "",
     "exec": "omarchy-update-available",
+    "exec-on-event": true,
     "on-click": "omarchy-launch-floating-terminal-with-presentation omarchy-update",
     "tooltip-format": "Omarchy update available",
     "signal": 7,
-    "interval": 21600
+    "interval": 3600
   },
 
   "cpu": {
@@ -128,9 +129,10 @@
     "orientation": "inherit",
     "drawer": {
       "transition-duration": 600,
+      "transition-left-to-right": false,
       "children-class": "tray-group-item"
     },
-    "modules": ["custom/expand-icon", "cpu", "custom/update", "tray"]
+    "modules": ["custom/expand-icon", "cpu", "tray"]
   },
   "custom/expand-icon": {
     "format": "",

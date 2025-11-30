@@ -56,6 +56,11 @@
   margin-right: 18px;
 }
 
+/* Tray drawer items */
+.tray-group-item {
+  margin: 0 5px;
+}
+
 tooltip {
   padding: 2px;
 }
