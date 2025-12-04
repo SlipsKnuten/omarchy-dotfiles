@@ -1,0 +1,20 @@
+#!/bin/bash
+
+LAPTOP_MONITOR="eDP-1"
+AC_ADAPTER="/sys/class/power_supply/ACAD/online"
+LID_STATE="/proc/acpi/button/lid/LID0/state"
+
+lid_state=$(awk '{print $2}' "$LID_STATE")
+
+if [[ "$lid_state" == "closed" ]]; then
+    if [[ "$(cat "$AC_ADAPTER" 2>/dev/null)" == "1" ]]; then
+        # On AC power: disable laptop display only
+        hyprctl keyword monitor "$LAPTOP_MONITOR,disable"
+    else
+        # On battery: lock the screen
+        omarchy-lock-screen
+    fi
+elif [[ "$lid_state" == "open" ]]; then
+    # Re-enable laptop display
+    hyprctl keyword monitor "$LAPTOP_MONITOR,preferred,auto,auto"
+fi
