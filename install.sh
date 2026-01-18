@@ -3,6 +3,10 @@ set -e
 
 echo "Installing dev tools..."
 
+# Base development tools (needed for AUR and building)
+echo "Installing base development tools..."
+sudo pacman -S --needed --noconfirm base-devel
+
 # tmux
 echo "Installing tmux..."
 sudo pacman -S --needed --noconfirm tmux
@@ -24,10 +28,20 @@ fi
 echo "Installing Python..."
 sudo pacman -S --needed --noconfirm python python-pip
 
+# Go
+echo "Installing Go..."
+sudo pacman -S --needed --noconfirm go
+
 # npm global tools
 if command -v npm &> /dev/null; then
     echo "Installing TypeScript globally..."
     npm install -g typescript typescript-language-server
+fi
+
+# Zen Browser (from AUR)
+if ! pacman -Qi zen-browser-bin &> /dev/null; then
+    echo "Installing Zen Browser..."
+    yay -S --needed --noconfirm zen-browser-bin
 fi
 
 echo ""
