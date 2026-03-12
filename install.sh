@@ -1,15 +1,27 @@
 #!/bin/bash
 set -e
 
+echo "=== Omarchy Dotfiles Setup ==="
+
+# System utilities
+echo "Installing system utilities..."
+sudo pacman -S --needed --noconfirm stow socat base-devel
+
+# Terminal emulators
+echo "Installing terminal emulators..."
+sudo pacman -S --needed --noconfirm ghostty kitty
+
+# Desktop apps (official repos)
+echo "Installing desktop apps..."
+sudo pacman -S --needed --noconfirm nautilus firefox obsidian spotify lazydocker signal-desktop tmux
+
+# Desktop apps (AUR)
+echo "Installing AUR packages..."
+yay -S --needed --noconfirm typora zen-browser-bin 1password tor-browser-bin openshift-client-bin
+
+# Dev tools
 echo "Installing dev tools..."
-
-# Base development tools (needed for AUR and building)
-echo "Installing base development tools..."
-sudo pacman -S --needed --noconfirm base-devel
-
-# tmux
-echo "Installing tmux..."
-sudo pacman -S --needed --noconfirm tmux
+sudo pacman -S --needed --noconfirm python python-pip go
 
 # Rust
 if ! command -v rustc &> /dev/null; then
@@ -18,19 +30,11 @@ if ! command -v rustc &> /dev/null; then
     source "$HOME/.cargo/env"
 fi
 
-# Node.js via mise (already in dotfiles)
+# Node.js via mise
 if command -v mise &> /dev/null; then
     echo "Installing Node.js via mise..."
     mise install
 fi
-
-# Python (usually pre-installed on Arch)
-echo "Installing Python..."
-sudo pacman -S --needed --noconfirm python python-pip
-
-# Go
-echo "Installing Go..."
-sudo pacman -S --needed --noconfirm go
 
 # npm global tools
 if command -v npm &> /dev/null; then
@@ -38,11 +42,10 @@ if command -v npm &> /dev/null; then
     npm install -g typescript typescript-language-server
 fi
 
-# Zen Browser (from AUR)
-if ! pacman -Qi zen-browser-bin &> /dev/null; then
-    echo "Installing Zen Browser..."
-    yay -S --needed --noconfirm zen-browser-bin
-fi
+# Stow dotfiles
+echo "Stowing dotfiles..."
+cd "$(dirname "$0")"
+stow --adopt -t ~ bash bin ghostty git hypr kitty lazygit mise nvim starship systemd tmux waybar zen 2>&1 || true
 
 echo ""
 echo "Done! Restart your shell or run: source ~/.bashrc"
