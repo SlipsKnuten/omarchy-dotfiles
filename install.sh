@@ -45,7 +45,7 @@ fi
 # Stow dotfiles
 echo "Stowing dotfiles..."
 cd "$(dirname "$0")"
-stow --adopt -t ~ bash bin ghostty git hypr kitty lazygit mise nvim starship systemd tmux waybar zen 2>&1 || true
+stow --adopt -t ~ bash bin ghostty git hypr kitty lazygit mise nvim starship systemd tmux waybar xdg zen 2>&1 || true
 
 echo ""
 echo "Done! Restart your shell or run: source ~/.bashrc"
