@@ -34,7 +34,6 @@
 #battery,
 #pulseaudio,
 #custom-omarchy,
-#custom-screenrecording-indicator,
 #custom-update {
   min-width: 12px;
   margin: 0 7.5px;
@@ -56,11 +55,6 @@
   margin-right: 18px;
 }
 
-/* Tray drawer items */
-.tray-group-item {
-  margin: 0 5px;
-}
-
 tooltip {
   padding: 2px;
 }
@@ -71,47 +65,36 @@ tooltip {
 
 #clock {
   margin-left: 8.75px;
-  margin-right: 12px;
 }
 
 .hidden {
   opacity: 0;
 }
 
-#custom-screenrecording-indicator {
+#custom-screenrecording-indicator,
+#custom-idle-indicator,
+#custom-notification-silencing-indicator {
   min-width: 12px;
-  margin-left: 8.75px;
+  margin-left: 5px;
+  margin-right: 0;
   font-size: 10px;
+  padding-bottom: 1px;
 }
 
 #custom-screenrecording-indicator.active {
   color: #a55555;
 }
 
-/* Taskbar styling */
-#taskbar {
-  padding: 0 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  margin: 4px;
+#custom-idle-indicator.active,
+#custom-notification-silencing-indicator.active {
+  color: #a55555;
 }
 
-#taskbar button {
-  padding: 4px 8px;
-  margin: 0 2px;
-  border-radius: 6px;
-  background: transparent;
+#custom-voxtype {
+  min-width: 12px;
+  margin: 0 0 0 7.5px;
 }
 
-#taskbar button.active {
-  background: rgba(255, 255, 255, 0.2);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
-}
-
-#taskbar button:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-#taskbar.empty {
-  opacity: 0;
+#custom-voxtype.recording {
+  color: #a55555;
 }
