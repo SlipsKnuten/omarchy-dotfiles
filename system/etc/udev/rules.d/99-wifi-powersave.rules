@@ -1,0 +1,2 @@
+SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", RUN+="/home/pepw/.local/share/omarchy/bin/omarchy-wifi-powersave on"
+SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", RUN+="/home/pepw/.local/share/omarchy/bin/omarchy-wifi-powersave off"
