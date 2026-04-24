@@ -1,4 +1,0 @@
-# theme.lua is an absolute symlink managed by omarchy-theme-set, not stow.
-# Stow refuses to handle absolute symlinks, so we exclude it and let
-# omarchy's theme hotreload manage the symlink directly.
-^/\.config/nvim/lua/plugins/theme\.lua$
