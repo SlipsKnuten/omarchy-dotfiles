@@ -4,6 +4,9 @@ return {
 		dir = vim.fn.stdpath("config"),
 		lazy = false,
 		priority = 1000,
+		cond = function()
+			return vim.fn.isdirectory(vim.fn.expand("~/.config/omarchy")) == 1
+		end,
 		config = function()
 			local transparency_file = vim.fn.stdpath("config") .. "/plugin/after/transparency.lua"
 
