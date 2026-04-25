@@ -101,8 +101,11 @@ if systemctl list-unit-files tailscaled.service &>/dev/null; then
 fi
 
 # -------------------------------------------------------------------- stow
+# Cross-platform configs (nvim, tmux, git, starship, lazygit, mise, xdg) live
+# in the sibling repo: github.com/SlipsKnuten/windows-dotfiles
+# Clone it and stow from there for the full setup.
 STOW_PACKAGES=(
-  bash bin git ghostty hypr kitty lazygit mise nvim starship systemd tmux waybar zen
+  bash bin ghostty hypr kitty systemd waybar zen
 )
 
 log "Stowing dotfiles (${STOW_PACKAGES[*]})"
