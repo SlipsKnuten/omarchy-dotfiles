@@ -27,7 +27,8 @@ fi
 log "Installing apt packages"
 sudo apt update
 sudo apt install -y \
-  build-essential ripgrep fd-find tmux stow git curl unzip
+  build-essential ripgrep fd-find tmux stow git curl unzip \
+  python3-venv python3-pip
 
 mkdir -p "$HOME/.local/bin"
 
