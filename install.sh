@@ -45,7 +45,7 @@ PACMAN_EXTRAS=(
   # browsers
   firefox torbrowser-launcher
   # terminals / editors
-  ghostty neovim
+  ghostty neovim wl-clipboard
   # dev toolchains
   go rust-src opencode yq
   nodejs npm
@@ -101,12 +101,17 @@ if systemctl list-unit-files tailscaled.service &>/dev/null; then
 fi
 
 # -------------------------------------------------------------------- stow
-# Cross-platform configs (nvim, tmux, git, starship, lazygit, mise, xdg) live
-# in the sibling repo: github.com/SlipsKnuten/windows-dotfiles
-# Clone it and stow from there for the full setup.
 STOW_PACKAGES=(
-  bash bin ghostty hypr kitty systemd waybar zen
+  bash bin ghostty hypr kitty nvim systemd waybar zen
 )
+
+NVIM_TARGET="$HOME/.config/nvim"
+NVIM_SOURCE="$REPO_DIR/nvim/.config/nvim"
+if [[ ( -e "$NVIM_TARGET" || -L "$NVIM_TARGET" ) && "$(readlink -f "$NVIM_TARGET")" != "$NVIM_SOURCE" ]]; then
+  NVIM_BACKUP="${NVIM_TARGET}.bak.$(date +%Y%m%d%H%M%S)"
+  log "Backing up existing Neovim config to $NVIM_BACKUP"
+  mv "$NVIM_TARGET" "$NVIM_BACKUP"
+fi
 
 log "Stowing dotfiles (${STOW_PACKAGES[*]})"
 # -R restows (removes dead links first). Fails loudly on conflicts — user
