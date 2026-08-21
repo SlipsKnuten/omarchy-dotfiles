@@ -25,6 +25,10 @@ shell-integration-features = no-cursor,ssh-env
 # Keyboard bindings
 keybind = shift+insert=paste_from_clipboard
 keybind = control+insert=copy_to_clipboard
+keybind = control+equal=increase_font_size:1
+keybind = control+shift+equal=increase_font_size:1
+keybind = control+minus=decrease_font_size:1
+keybind = control+zero=reset_font_size
 keybind = super+control+shift+alt+arrow_down=resize_split:down,100
 keybind = super+control+shift+alt+arrow_up=resize_split:up,100
 keybind = super+control+shift+alt+arrow_left=resize_split:left,100
