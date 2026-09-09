@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  echo "Usage: keyboard-backlight-memory {init|idle-off|restore|capture|up|down|cycle}" >&2
+  exit 2
+}
+
+action="${1:-}"
+case "$action" in
+init | idle-off | restore | capture | up | down | cycle) ;;
+*) usage ;;
+esac
+
+device=""
+for candidate in /sys/class/leds/*kbd_backlight*; do
+  if [[ -e "$candidate" ]]; then
+    device="$(basename "$candidate")"
+    break
+  fi
+done
+
+if [[ -z "$device" ]]; then
+  echo "No keyboard backlight device found" >&2
+  exit 1
+fi
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/keyboard-backlight-memory"
+state_file="$state_dir/level"
+mkdir -p "$state_dir"
+
+exec 9>"${XDG_RUNTIME_DIR:-/tmp}/keyboard-backlight-memory-${UID}.lock"
+flock 9
+
+max_brightness="$(brightnessctl -d "$device" max)"
+[[ "$max_brightness" =~ ^[0-9]+$ ]] && ((max_brightness > 0)) || {
+  echo "Invalid maximum brightness for $device: $max_brightness" >&2
+  exit 1
+}
+
+clamp() {
+  local level="$1"
+  ((level < 0)) && level=0
+  ((level > max_brightness)) && level="$max_brightness"
+  printf '%s\n' "$level"
+}
+
+save_level() {
+  local level
+  level="$(clamp "$1")"
+  printf '%s\n' "$level" >"${state_file}.tmp.$$"
+  mv "${state_file}.tmp.$$" "$state_file"
+}
+
+current_level() {
+  brightnessctl -d "$device" get
+}
+
+preferred_level() {
+  local level=""
+
+  if [[ -f "$state_file" ]]; then
+    level="$(<"$state_file")"
+  fi
+
+  if [[ ! "$level" =~ ^[0-9]+$ ]]; then
+    level="$(current_level)"
+  fi
+
+  level="$(clamp "$level")"
+  save_level "$level"
+  printf '%s\n' "$level"
+}
+
+set_level() {
+  brightnessctl -d "$device" set "$1" >/dev/null
+}
+
+show_osd() {
+  omarchy-osd -i keyboard -p "$(( $1 * 100 / max_brightness ))"
+}
+
+case "$action" in
+init | restore)
+  level="$(preferred_level)"
+  set_level "$level"
+  ;;
+idle-off)
+  # Deliberately do not save: idle is temporary, including nested lock events.
+  set_level 0
+  ;;
+capture)
+  level="$(clamp "$(current_level)")"
+  # A zero seen after the idle timer fired is not a new preference. Manual
+  # selection of zero is already recorded by down/cycle.
+  if ((level > 0)) || [[ ! -f "$state_file" ]]; then
+    save_level "$level"
+  else
+    preferred_level >/dev/null
+  fi
+  ;;
+up | down | cycle)
+  level="$(preferred_level)"
+  step=$((max_brightness / 10))
+  ((step < 1)) && step=1
+
+  case "$action" in
+  up)
+    level=$((level + step))
+    ((level > max_brightness)) && level="$max_brightness"
+    ;;
+  down)
+    level=$((level - step))
+    ((level < 0)) && level=0
+    ;;
+  cycle)
+    level=$((level + step))
+    ((level > max_brightness)) && level=0
+    ;;
+  esac
+
+  save_level "$level"
+  set_level "$level"
+  show_osd "$level"
+  ;;
+esac

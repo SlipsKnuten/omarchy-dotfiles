@@ -2,9 +2,9 @@
 #
 # Reproduce this machine on a fresh Omarchy install.
 #
-# Assumes Omarchy is already installed (Hyprland, Waybar, yay, etc. provided
-# by Omarchy base). Installs the extras on top, deploys system-level power /
-# lid configs, enables services, and stows the dotfiles.
+# Assumes Omarchy Quattro is already installed. Installs the extras on top,
+# deploys the system-level lid config, enables services, and stows the
+# dotfiles.
 #
 # Usage:
 #   cd ~/omarchy-dotfiles && ./install.sh
@@ -19,29 +19,24 @@ warn() { printf '\n\033[1;33m[warn]\033[0m %s\n' "$*" >&2; }
 
 # ---------------------------------------------------------------- prerequisites
 log "Checking prerequisites"
-if ! command -v omarchy-version &>/dev/null; then
-  warn "omarchy-version not found — this script is written for Omarchy."
-  warn "Continuing anyway; some services / paths may not exist."
-fi
-
-if ! command -v yay &>/dev/null; then
-  echo "yay is required but not installed. Install Omarchy first." >&2
+if ! command -v omarchy &>/dev/null; then
+  echo "The Omarchy CLI is required. Install Omarchy first." >&2
   exit 1
 fi
 
 if ! command -v stow &>/dev/null; then
   log "Installing GNU stow"
-  sudo pacman -S --needed --noconfirm stow
+  omarchy pkg add stow
 fi
 
 # ------------------------------------------------------------- pacman extras
 # Packages beyond the Omarchy base. Keep in sync with the output of:
 #   comm -23 <(pacman -Qqe | sort) \
-#     <(cat ~/.local/share/omarchy/install/omarchy-*.packages \
+#     <(cat /usr/share/omarchy/install/omarchy-*.packages \
 #        | grep -v '^#' | grep -v '^$' | sort -u)
 PACMAN_EXTRAS=(
   # media
-  audacity qbittorrent vlc vlc-plugin-ffmpeg
+  audacity qbittorrent
   # browsers
   firefox torbrowser-launcher
   # terminals / editors
@@ -50,7 +45,7 @@ PACMAN_EXTRAS=(
   go rust-src opencode yq
   nodejs npm
   # runtimes / daemons
-  flatpak fwupd tailscale
+  flatpak fwupd hypridle tailscale
   # wine
   wine wine-gecko wine-mono
   # fonts
@@ -62,7 +57,7 @@ PACMAN_EXTRAS=(
 )
 
 log "Installing pacman extras (${#PACMAN_EXTRAS[@]} packages)"
-sudo pacman -S --needed --noconfirm "${PACMAN_EXTRAS[@]}"
+omarchy pkg add "${PACMAN_EXTRAS[@]}"
 
 # ----------------------------------------------------------------- AUR extras
 AUR_EXTRAS=(
@@ -70,11 +65,10 @@ AUR_EXTRAS=(
   plex-media-server
   snapd
   stripe-cli
-  makima-bin
 )
 
 log "Installing AUR extras (${#AUR_EXTRAS[@]} packages)"
-yay -S --needed --noconfirm "${AUR_EXTRAS[@]}"
+omarchy pkg aur add "${AUR_EXTRAS[@]}"
 
 # ----------------------------------------------------------- system/ deploy
 # /etc/ files that aren't stow-managed (stow targets $HOME).
@@ -85,10 +79,8 @@ while IFS= read -r -d '' src; do
   sudo install -D -m 644 "$src" "$dest"
 done < <(find system -type f -print0)
 
-log "Reloading systemd + udev"
+log "Reloading systemd"
 sudo systemctl daemon-reload
-sudo udevadm control --reload-rules
-sudo udevadm trigger
 
 # ------------------------------------------------------------ enable services
 log "Enabling services"
@@ -102,13 +94,38 @@ fi
 
 # -------------------------------------------------------------------- stow
 STOW_PACKAGES=(
-  bash bin ghostty hypr kitty nvim systemd waybar zen
+  bash bin ghostty hypr kitty nvim omarchy zen
 )
+
+BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
+
+backup_stow_conflict() {
+  local package="$1"
+  local relative="$2"
+  local source="$REPO_DIR/$package/$relative"
+  local target="$HOME/$relative"
+
+  if [[ -L "$target" && "$(readlink -f "$target")" == "$source" ]]; then
+    # GNU Stow does not adopt absolute links, even when they already point at
+    # the right file. Remove only that exact link so it can create its normal
+    # relative one below.
+    unlink "$target"
+  elif [[ -e "$target" || -L "$target" ]]; then
+    local backup="${target}.bak.${BACKUP_SUFFIX}"
+    log "Backing up generated config $target to $backup"
+    mv "$target" "$backup"
+  fi
+}
+
+for hypr_file in autostart.lua bindings.lua hyprland.lua input.lua looknfeel.lua monitors.lua hypridle-kbd.conf; do
+  backup_stow_conflict hypr ".config/hypr/$hypr_file"
+done
+backup_stow_conflict omarchy ".config/omarchy/shell.json"
 
 NVIM_TARGET="$HOME/.config/nvim"
 NVIM_SOURCE="$REPO_DIR/nvim/.config/nvim"
 if [[ ( -e "$NVIM_TARGET" || -L "$NVIM_TARGET" ) && "$(readlink -f "$NVIM_TARGET")" != "$NVIM_SOURCE" ]]; then
-  NVIM_BACKUP="${NVIM_TARGET}.bak.$(date +%Y%m%d%H%M%S)"
+  NVIM_BACKUP="${NVIM_TARGET}.bak.${BACKUP_SUFFIX}"
   log "Backing up existing Neovim config to $NVIM_BACKUP"
   mv "$NVIM_TARGET" "$NVIM_BACKUP"
 fi
@@ -141,7 +158,8 @@ cat <<EOF
 Done.
 
 Next steps:
-  * Restart hypridle   : pkill hypridle; hyprctl reload
+  * Restart hypridle   : pkill -f 'hypridle -c .*/hypridle-kbd.conf'; hyprctl reload
+  * Restart the shell  : omarchy restart shell
   * Log out / in       : to pick up stowed bash / env changes
   * Verify lid handling: close lid with / without external monitor
   * Verify power switch: powerprofilesctl get  (unplug, plug in)
