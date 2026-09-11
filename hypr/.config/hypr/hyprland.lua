@@ -9,3 +9,8 @@ require("hypr.bindings")
 require("hypr.looknfeel")
 require("hypr.autostart")
 require("default.hypr.toggles")
+
+-- Keep Omarchy's shell idle timer suspended while watching YouTube in Zen.
+-- Zen publishes a D-Bus screensaver inhibitor, but the shell idle monitor
+-- currently listens for Hyprland/Wayland inhibitors instead.
+o.window({ class = "^zen$", title = ".*YouTube.*" }, { idle_inhibit = "focus" })
