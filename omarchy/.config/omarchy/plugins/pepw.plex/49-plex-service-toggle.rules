@@ -1,0 +1,9 @@
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.policykit.exec" &&
+        action.lookup("program") == "/usr/local/bin/plex-service-toggle" &&
+        subject.user == "pepw" &&
+        subject.local == true &&
+        subject.active == true) {
+        return polkit.Result.YES;
+    }
+});
