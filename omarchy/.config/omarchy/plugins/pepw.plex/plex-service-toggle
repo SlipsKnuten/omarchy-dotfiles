@@ -1,0 +1,17 @@
+#!/bin/bash
+set -euo pipefail
+
+readonly plex_service="plexmediaserver.service"
+
+case "${1:-}" in
+  on)
+    exec /usr/bin/systemctl enable --now "$plex_service"
+    ;;
+  off)
+    exec /usr/bin/systemctl disable --now "$plex_service"
+    ;;
+  *)
+    echo "Usage: plex-service-toggle {on|off}" >&2
+    exit 64
+    ;;
+esac

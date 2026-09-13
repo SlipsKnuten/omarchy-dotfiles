@@ -79,6 +79,12 @@ while IFS= read -r -d '' src; do
   sudo install -D -m 644 "$src" "$dest"
 done < <(find system -type f -print0)
 
+# The Plex bar widget needs a narrowly authorized root helper to toggle the
+# system service without prompting on every click.
+PLEX_PLUGIN_DIR="$REPO_DIR/omarchy/.config/omarchy/plugins/pepw.plex"
+sudo install -D -m 755 "$PLEX_PLUGIN_DIR/plex-service-toggle" /usr/local/bin/plex-service-toggle
+sudo install -D -m 644 "$PLEX_PLUGIN_DIR/49-plex-service-toggle.rules" /etc/polkit-1/rules.d/49-plex-service-toggle.rules
+
 log "Reloading systemd"
 sudo systemctl daemon-reload
 
@@ -94,7 +100,7 @@ fi
 
 # -------------------------------------------------------------------- stow
 STOW_PACKAGES=(
-  bash bin ghostty hypr kitty nvim omarchy zen
+  bash bin ghostty hypr kitty nvim omarchy systemd zen
 )
 
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
@@ -134,6 +140,9 @@ log "Stowing dotfiles (${STOW_PACKAGES[*]})"
 # -R restows (removes dead links first). Fails loudly on conflicts — user
 # should resolve manually rather than being clobbered by --adopt.
 stow -v -R -t "$HOME" "${STOW_PACKAGES[@]}"
+
+systemctl --user daemon-reload
+systemctl --user enable --now hypridle-suspend.service || warn "hypridle-suspend enable failed"
 
 # --------------------------------------------------------------- mise toolchains
 if command -v mise &>/dev/null; then

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "pepw.plex",
+  "name": "Plex",
+  "version": "1.0.0",
+  "author": "pepw",
+  "description": "Persistent one-click power control for Plex Media Server.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Plex",
+    "description": "Start or stop Plex Media Server and its boot-time startup.",
+    "category": "Media",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
