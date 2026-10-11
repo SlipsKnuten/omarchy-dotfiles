@@ -13,3 +13,7 @@ if not (vim.env.PATH or ""):find(cargo_bin, 1, true) then
 end
 
 vim.opt.clipboard = "unnamedplus"
+
+-- Jumplist as a browser-style stack: jumping after <C-o> drops the forward
+-- entries, and the scroll position is restored when jumping back.
+vim.opt.jumpoptions = "stack,view"
