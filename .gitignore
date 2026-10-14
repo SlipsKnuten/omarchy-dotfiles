@@ -8,10 +8,9 @@
 **/*.key
 **/credentials*
 **/secrets*
+# Browser profile: passwords and cookies
+zen/
 
-# Browser caches (for zen)
-zen/.zen/**/cache*/
-zen/.zen/**/Cache*/
 **/*.sqlite-shm
 **/*.sqlite-wal
 **/.parentlock

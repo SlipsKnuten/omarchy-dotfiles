@@ -111,7 +111,7 @@ fi
 
 # -------------------------------------------------------------------- stow
 STOW_PACKAGES=(
-  bash bin ghostty hypr kanata kitty nvim omarchy systemd zen
+  bash bin ghostty hypr kanata kitty nvim omarchy systemd
 )
 
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
