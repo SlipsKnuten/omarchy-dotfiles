@@ -65,6 +65,7 @@ AUR_EXTRAS=(
   plex-media-server
   snapd
   stripe-cli
+  kanata-bin
 )
 
 log "Installing AUR extras (${#AUR_EXTRAS[@]} packages)"
@@ -78,6 +79,16 @@ while IFS= read -r -d '' src; do
   echo "  $src -> $dest"
   sudo install -D -m 644 "$src" "$dest"
 done < <(find system -type f -print0)
+
+# kanata (home row mods) reads keyboards from /dev/input and types through
+# /dev/uinput. The udev rule and modules-load file come from system/ above;
+# here the user joins the groups that can use them.
+log "Setting up kanata permissions"
+getent group uinput >/dev/null || sudo groupadd --system uinput
+sudo usermod -aG input,uinput "$USER"
+sudo modprobe uinput
+sudo udevadm control --reload-rules
+sudo udevadm trigger --subsystem-match=misc --sysname-match=uinput
 
 # The Plex bar widget needs a narrowly authorized root helper to toggle the
 # system service without prompting on every click.
@@ -100,7 +111,7 @@ fi
 
 # -------------------------------------------------------------------- stow
 STOW_PACKAGES=(
-  bash bin ghostty hypr kitty nvim omarchy systemd zen
+  bash bin ghostty hypr kanata kitty nvim omarchy systemd zen
 )
 
 BACKUP_SUFFIX="$(date +%Y%m%d%H%M%S)"
@@ -143,6 +154,9 @@ stow -v -R -t "$HOME" "${STOW_PACKAGES[@]}"
 
 systemctl --user daemon-reload
 systemctl --user enable --now hypridle-suspend.service || warn "hypridle-suspend enable failed"
+# Only enabled: it can't open the keyboards until the new input/uinput group
+# membership is active, which needs a fresh login.
+systemctl --user enable kanata.service || warn "kanata enable failed"
 
 # --------------------------------------------------------------- mise toolchains
 if command -v mise &>/dev/null; then
@@ -169,7 +183,10 @@ Done.
 Next steps:
   * Restart hypridle   : pkill -f 'hypridle -c .*/hypridle-kbd.conf'; hyprctl reload
   * Restart the shell  : omarchy restart shell
-  * Log out / in       : to pick up stowed bash / env changes
+  * Log out / in       : to pick up stowed bash / env changes and the
+                         input/uinput groups; kanata (hold a = Alt,
+                         hold s = Shift) starts on that login
+  * Verify kanata      : systemctl --user status kanata
   * Verify lid handling: close lid with / without external monitor
   * Verify power switch: powerprofilesctl get  (unplug, plug in)
   * Open nvim          : Mason should auto-install LSP servers

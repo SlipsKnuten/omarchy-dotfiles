@@ -1,0 +1,69 @@
+;; ============================================================================
+;; kanata.kbd — home row mods for Alt and Shift
+;;
+;; Goal: no more stretching for Shift. Hold a home-row key and it acts as
+;; Alt/Shift; tap it and it types the letter. Only the left hand has mods;
+;; Ctrl, Caps Lock and every other key are left alone.
+;;
+;;   Left hand
+;;    a     s     d    f
+;;   Alt  Shift   .    .
+;;
+;; Examples:
+;;   Alt+j        -> hold a, press j
+;;   Alt+w        -> hold a, press w
+;;   capital J    -> hold s, press j
+;;   capital A    -> hold s, press a
+;;   Alt+Shift+H  -> hold a and s, press h
+;; Capital S and Alt+a still need the real Shift/Alt key.
+;;
+;; A modifier only kicks in once the other key has been pressed AND released
+;; while a/s is still held, so rolling through "as" or "sa" types letters.
+;; Right after a fast tap the mods are also switched off briefly, so they don't
+;; misfire mid-word.
+;;
+;; Emergency exit: physical Left Ctrl + Space + Esc kills kanata.
+;;
+;; Based on kanata's cfg_samples/home-row-mod-advanced.kbd. Same file as
+;; windows-dotfiles/windows/kanata.kbd, so keep the two in sync.
+;; ============================================================================
+
+(defcfg
+  ;; Every key not listed in defsrc passes through untouched.
+  process-unmapped-keys yes
+)
+
+(defsrc
+  a   s
+)
+
+(defvar
+  ;; Tuning: if letters turn into Alt/Shift while typing, raise hold-time.
+  ;; If holding feels sluggish before the modifier kicks in, lower it.
+  tap-time 200
+  hold-time 200
+)
+
+(deflayer base
+  @a  @s
+)
+
+;; While typing quickly the home row mods are switched off, and they come back
+;; after 20 ms with no key activity.
+(deflayer nomods
+  a   s
+)
+
+(deffakekeys
+  to-base (layer-switch base)
+)
+
+(defalias
+  tap (multi
+    (layer-switch nomods)
+    (on-idle-fakekey to-base tap 20)
+  )
+
+  a (tap-hold-release $tap-time $hold-time (multi a @tap) lalt)
+  s (tap-hold-release $tap-time $hold-time (multi s @tap) lsft)
+)

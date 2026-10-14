@@ -1,0 +1,14 @@
+[Unit]
+Description=kanata home row mods (a = Alt, s = Shift)
+Documentation=https://github.com/jtroo/kanata
+
+[Service]
+Type=simple
+# --no-wait so kanata exits instead of waiting for a keypress, letting
+# Restart=on-failure bring it back.
+ExecStart=/usr/bin/kanata --cfg %h/.config/kanata/kanata.kbd --no-wait
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target
